@@ -5,6 +5,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>PerfumesL&amp;R Somos Fabricante.</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#1a0a14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PerfumesL&R">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="PerfumesL&R">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <meta name="description" content="PerfumesL&amp;R Somos Fabricante. Esencias con calidad al original 1.1 — 30 · 60 · 120 ml">
 
 <!-- Vista previa al compartir (WhatsApp, Facebook, Telegram…) -->
@@ -3546,6 +3556,14 @@ function roundRect(ctx, x, y, w, h, r) {
 
 
 loadFromFirebase();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js').catch(function (e) { console.warn('[PWA]', e); });
+  });
+}
 </script>
 </body>
 </html>

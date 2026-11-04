@@ -1,7 +1,7 @@
 {
   "name": "Perfumes L&R",
-  "short_name": "PerfumesL&R",
-  "description": "Catálogo Perfumes L&R — esencias 30 · 60 · 120 ml",
+  "short_name": "Perfumes L&R",
+  "description": "Catálogo Perfumes L&R",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

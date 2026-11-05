@@ -308,10 +308,11 @@ input,select,textarea{width:100%;background:var(--card);border:1px solid #333;co
 
 /* Pantalla de bienvenida */
 .welcome-layer{
-  position:fixed;inset:0;z-index:99999;
-  background:rgba(0,0,0,.85);
-  display:flex;align-items:center;justify-content:center;
-  padding:16px;
+  position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.82);
+  display:none;align-items:center;justify-content:center;padding:18px;
+}
+.welcome-layer.show{
+  display:flex;
   animation:welcomeFadeIn .35s ease;
 }
 .welcome-layer.hidden{display:none !important}
@@ -741,9 +742,23 @@ body.skin-navidad .card{border-color:#1b5e20}
     d.style.opacity=String(0.2+Math.random()*0.45);
     dots.appendChild(d); } }
   var done=false;
-  function hide(){ if(done) return; done=true; s.classList.add('hide');
-    setTimeout(function(){ try{ s.remove(); }catch(e){} }, 600); }
-  // ~3 seconds visible
+  function showWelcomeAfterSplash(){
+    try {
+      if (sessionStorage.getItem('lr_welcome_seen') === '1') return;
+      var el = document.getElementById('welcomeLayer');
+      if (!el || el.classList.contains('hidden')) return;
+      el.classList.add('show');
+      el.style.display = 'flex';
+    } catch(e) {}
+  }
+  function hide(){
+    if(done) return; done=true; s.classList.add('hide');
+    setTimeout(function(){
+      try{ s.remove(); }catch(e){}
+      showWelcomeAfterSplash();
+    }, 500);
+  }
+  // ~3 seconds splash, then welcome banner
   setTimeout(hide, 3000);
   window.addEventListener('load', function(){ setTimeout(hide, 3200); });
 })();
@@ -2830,6 +2845,8 @@ function closeWelcome(e) {
   var el = document.getElementById("welcomeLayer");
   if (!el) return;
   el.classList.add("hide");
+  el.classList.remove("show");
+  try { sessionStorage.setItem("lr_welcome_seen", "1"); } catch (err) {}
   setTimeout(function() {
     el.style.display = "none";
     el.classList.add("hidden");
@@ -2840,7 +2857,9 @@ function closeWelcome(e) {
 document.addEventListener("DOMContentLoaded", function() {
   var el = document.getElementById("welcomeLayer");
   if (el) {
-    el.style.display = "flex";
+    /* Banner de bienvenida: se muestra DESPUÉS del splash (~3s), no al cargar */
+    el.style.display = "none";
+    el.classList.remove("show");
     el.addEventListener("click", function(ev) {
       if (ev.target === el) closeWelcome(ev);
     });

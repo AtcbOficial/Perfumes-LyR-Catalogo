@@ -1,10 +1,4 @@
 <!DOCTYPE html>
-<!--
-  PROYECTO: 🧴 Perfumes L&R Catalogo
-  Descripción: Fabricantes de lociones personales
-  Catálogo público de la empresa 🧴 Perfumes L&R
-  (proyecto base: 👨‍💼 Luis Jose Bonilla & Empresas)
--->
 <!-- Catálogo COLOMBIA — Firebase: perfumes-lyr-co -->
 <html lang="es">
 <head>
@@ -16,17 +10,17 @@
 <meta name="theme-color" content="#1a0a14">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Perfumes L&R Catalogo">
+<meta name="apple-mobile-web-app-title" content="PerfumesL&R">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="application-name" content="Perfumes L&R Catalogo">
+<meta name="application-name" content="PerfumesL&R">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<meta name="description" content="🧴 Perfumes L&amp;R Catalogo Esencias con calidad al original 1.1 — 30 · 60 · 120 ml">
+<meta name="description" content="PerfumesL&amp;R Somos Fabricante. Esencias con calidad al original 1.1 — 30 · 60 · 120 ml">
 
 <!-- Vista previa al compartir (WhatsApp, Facebook, Telegram…) -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Perfumes L&amp;R">
-<meta property="og:title" content="🧴 Perfumes L&amp;R Catalogo">
+<meta property="og:title" content="PerfumesL&amp;R Somos Fabricante.">
 <meta property="og:description" content="Somos fabricantes de perfumes. Réplicas 1.1 Premium · 30 · 60 · 120 ml">
 <meta property="og:url" content="https://atcboficial.github.io/PerfumesLyR.Co/">
 <meta property="og:image" content="https://atcboficial.github.io/PerfumesLyR.Co/images/og-share.jpg">
@@ -34,7 +28,7 @@
 <meta property="og:image:height" content="656">
 <meta property="og:image:type" content="image/jpeg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="🧴 Perfumes L&amp;R Catalogo">
+<meta name="twitter:title" content="PerfumesL&amp;R Somos Fabricante.">
 <meta name="twitter:description" content="Somos fabricantes de perfumes. Réplicas 1.1 Premium">
 <meta name="twitter:image" content="https://atcboficial.github.io/PerfumesLyR.Co/images/og-share.jpg">
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
@@ -308,13 +302,13 @@ input,select,textarea{width:100%;background:var(--card);border:1px solid #333;co
 
 /* Pantalla de bienvenida */
 .welcome-layer{
-  position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.82);
-  display:none;align-items:center;justify-content:center;padding:18px;
-}
-.welcome-layer.show{
-  display:flex;
+  position:fixed;inset:0;z-index:99999;
+  background:rgba(0,0,0,.85);
+  display:none;align-items:center;justify-content:center;
+  padding:16px;
   animation:welcomeFadeIn .35s ease;
 }
+.welcome-layer.show{display:flex;animation:welcomeFadeIn .35s ease}
 .welcome-layer.hidden{display:none !important}
 .welcome-layer.hide{
   animation:welcomeFadeOut .3s ease forwards;
@@ -709,7 +703,7 @@ body.skin-navidad .card{border-color:#1b5e20}
 #appSplash{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(ellipse at 30% 20%,#c9a22733 0%,transparent 50%),
              radial-gradient(ellipse at 70% 80%,#c9a22722 0%,transparent 45%),
-             linear-gradient(160deg,#2a0c20 0%,#3d1530 55%,#2a0c20 100%);
+             linear-gradient(160deg,#000000 0%,#2a0c20 55%,#000000 100%);
   transition:opacity .55s ease,visibility .55s ease;opacity:1;visibility:visible}
 #appSplash.hide{opacity:0;visibility:hidden;pointer-events:none}
 #appSplash .sp-wrap{position:relative;text-align:center;padding:24px}
@@ -751,14 +745,8 @@ body.skin-navidad .card{border-color:#1b5e20}
       el.style.display = 'flex';
     } catch(e) {}
   }
-  function hide(){
-    if(done) return; done=true; s.classList.add('hide');
-    setTimeout(function(){
-      try{ s.remove(); }catch(e){}
-      showWelcomeAfterSplash();
-    }, 500);
-  }
-  // ~3 seconds splash, then welcome banner
+  function hide(){ if(done) return; done=true; s.classList.add('hide');
+    setTimeout(function(){ try{ s.remove(); }catch(e){} showWelcomeAfterSplash(); }, 500); }
   setTimeout(hide, 3000);
   window.addEventListener('load', function(){ setTimeout(hide, 3200); });
 })();
@@ -794,7 +782,7 @@ body.skin-navidad .card{border-color:#1b5e20}
 <section id="catalogo" class="section active">
   <div class="catalog-sticky" id="catalogSticky">
     <div class="search-bar">
-      <input type="text" id="search" placeholder="🔍 Buscar perfume..." oninput="renderCatalog()">
+      <input type="text" id="search" placeholder="🔍 Buscar nombre o código id..." oninput="renderCatalog()">
     </div>
     <div class="filters" id="filterBar">
       <button class="active" data-filter="all" onclick="setFilter('all',this)">Todos</button>
@@ -1684,11 +1672,12 @@ function renderCatalog() {
       '</div>' +
       '<div class="card-body">' +
         '<div class="card-title">' + safeName + '</div>' +
+        (p.code || p.codigo ? '<div class="card-code" style="font-size:10px;color:var(--gold);margin:0 0 4px;font-weight:600">ID: ' + escapeHtml(String(p.code || p.codigo)) + '</div>' : '') +
         '<div>' +
           tagBadgesHtml(p) +
           (p.agotado ? '<span class="badge agotado">AGOTADO</span>' : '') +
         '</div>' +
-        '<div class="sizes-hint">' + sizesHintText() + (p.code ? ' · <span class="card-code">' + escapeHtml(String(p.code)) + '</span>' : '') + '</div>' +
+        '<div class="sizes-hint">' + sizesHintText() + '</div>' +
         '<div class="btns">' + btn + '</div>' +
       '</div></div>';
   }).join("");
@@ -2857,7 +2846,6 @@ function closeWelcome(e) {
 document.addEventListener("DOMContentLoaded", function() {
   var el = document.getElementById("welcomeLayer");
   if (el) {
-    /* Banner de bienvenida: se muestra DESPUÉS del splash (~3s), no al cargar */
     el.style.display = "none";
     el.classList.remove("show");
     el.addEventListener("click", function(ev) {

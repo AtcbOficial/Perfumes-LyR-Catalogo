@@ -813,7 +813,9 @@ body.skin-navidad .card{border-color:#1b5e20}
     <button class="btn" onclick="loginAdmin()">Entrar</button>
     <p class="hint" style="margin-top:10px;font-size:12px;color:var(--muted)">Firebase nuevo: usa la clave inicial <strong style="color:var(--gold)">Lr&amp;R2026!</strong> y luego cámbiala en el panel.</p>
   </div>
-  <div id="cloudBackupBox" class="card" style="display:none;margin:12px 0;padding:14px;border:1px solid var(--gold);border-radius:12px;background:#141414">
+<div id="adminPanel" class="admin-panel" style="display:none">
+    
+<div id="cloudBackupBox" class="card" style="margin:12px 0;padding:14px;border:1px solid var(--gold);border-radius:12px;background:#141414">
   <div style="font-weight:700;color:var(--gold);margin-bottom:6px">☁️ Firebase (nube) y sus herramientas</div>
   <p style="font-size:12px;color:var(--muted);margin:0 0 8px">Respaldo <strong>TOTAL</strong> del catálogo: productos, config (WA, skin, banner, flyer, clave, etiquetas, capacidades) y más. JSON portable. Imágenes = links https (.png preferido).</p>
   <p id="cloudBackupStatus" style="font-size:12px;margin:0 0 8px;color:var(--muted)">Listo</p>
@@ -822,10 +824,9 @@ body.skin-navidad .card{border-color:#1b5e20}
     <button type="button" class="btn" id="btnCatCloudImport">⬆️ JSON → Firebase (restaurar)</button>
     <button type="button" class="btn" id="btnCatCloudReload">☁️ Recargar desde Firebase</button>
   </div>
-  <input type="file" id="catCloudImportFile" accept="application/json,.json" style="display:none">
+  <input type="file" id="catCloudImportFile" accept="application/json,.json" style="">
 </div>
-<div id="adminPanel" class="admin-panel" style="display:none">
-    <h2>Panel de gestión</h2>
+<h2>Panel de gestión</h2>
     <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Toca cada título para abrir o cerrar el apartado.</p>
 
     <!-- 1. WhatsApp -->
@@ -1423,7 +1424,7 @@ function showSection(id, btn) {
     renderProductTagsUI();
     document.getElementById("waNumber").value = config.wa || "";
     if (sessionStorage.getItem("lr_admin") === "1") {
-      document.getElementById("adminLogin").style.display = "none"; try{var _cb=document.getElementById('cloudBackupBox'); if(_cb)_cb.style.display='block';}catch(e){};
+      document.getElementById("adminLogin").style.display = "none"; /* cloud vive dentro de adminPanel */
       document.getElementById("adminPanel").style.display = "block";
       renderAdminProducts();
     } else {
@@ -1995,7 +1996,7 @@ function loginAdmin() {
   sha256Hex(pass).then(function(hash) {
     if (hash === getAdminHash()) {
       sessionStorage.setItem("lr_admin", "1");
-      document.getElementById("adminLogin").style.display = "none"; try{var _cb=document.getElementById('cloudBackupBox'); if(_cb)_cb.style.display='block';}catch(e){};
+      document.getElementById("adminLogin").style.display = "none"; /* cloud vive dentro de adminPanel */
       document.getElementById("adminPanel").style.display = "block";
       document.getElementById("waNumber").value = config.wa || "";
       revealAdminNav(true);

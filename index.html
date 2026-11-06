@@ -4,15 +4,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🧴 Perfumes L&amp;R Catalogo</title>
+<title>🧴 Perfumes L&R Fabricantes de lociones personales</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#1a0a14">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="PerfumesL&R">
+<meta name="apple-mobile-web-app-title" content="Perfumes L&amp;R">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="application-name" content="PerfumesL&R">
+<meta name="application-name" content="Perfumes L&amp;R">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <meta name="description" content="PerfumesL&amp;R Somos Fabricante. Esencias con calidad al original 1.1 — 30 · 60 · 120 ml">
@@ -20,17 +20,17 @@
 <!-- Vista previa al compartir (WhatsApp, Facebook, Telegram…) -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Perfumes L&amp;R">
-<meta property="og:title" content="PerfumesL&amp;R Somos Fabricante.">
-<meta property="og:description" content="Somos fabricantes de perfumes. Réplicas 1.1 Premium · 30 · 60 · 120 ml">
-<meta property="og:url" content="https://atcboficial.github.io/PerfumesLyR.Co/">
-<meta property="og:image" content="https://atcboficial.github.io/PerfumesLyR.Co/images/og-share.png">
+<meta property="og:title" content="🧴 Perfumes L&R Fabricantes de lociones personales">
+<meta property="og:description" content="Fabricantes de lociones personales · Réplicas 1.1 Premium · 30 · 60 · 120 ml · Colombia y Venezuela">
+<meta property="og:url" content="https://atcboficial.github.io/Perfumes-LyR-Catalogo/">
+<meta property="og:image" content="https://atcboficial.github.io/Perfumes-LyR-Catalogo/images/og-share.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="1176">
 <meta property="og:image:type" content="image/png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="PerfumesL&amp;R Somos Fabricante.">
-<meta name="twitter:description" content="Somos fabricantes de perfumes. Réplicas 1.1 Premium">
-<meta name="twitter:image" content="https://atcboficial.github.io/PerfumesLyR.Co/images/og-share.png">
+<meta name="twitter:title" content="🧴 Perfumes L&R Fabricantes de lociones personales">
+<meta name="twitter:description" content="Fabricantes de lociones personales · Réplicas 1.1 Premium · 30 · 60 · 120 ml · Colombia y Venezuela">
+<meta name="twitter:image" content="https://atcboficial.github.io/Perfumes-LyR-Catalogo/images/og-share.png">
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -804,7 +804,15 @@ body.skin-navidad .card{border-color:#1b5e20}
 </section>
 
 <section id="admin" class="section">
-<div id="cloudBackupBox" class="card" style="margin:12px 0;padding:14px;border:1px solid var(--gold);border-radius:12px;background:#141414">
+
+
+
+  <div id="adminLogin" class="admin-login">
+    <h2>Admin</h2>
+    <input type="password" id="adminPass" placeholder="Contraseña">
+    <button class="btn" onclick="loginAdmin()">Entrar</button>
+  </div>
+  <div id="cloudBackupBox" class="card" style="display:none;margin:12px 0;padding:14px;border:1px solid var(--gold);border-radius:12px;background:#141414">
   <div style="font-weight:700;color:var(--gold);margin-bottom:6px">☁️ Firebase (nube) y sus herramientas</div>
   <p style="font-size:12px;color:var(--muted);margin:0 0 8px">Respaldo <strong>TOTAL</strong> del catálogo: productos, config (WA, skin, banner, flyer, clave, etiquetas, capacidades) y más. JSON portable. Imágenes = links https (.png preferido).</p>
   <p id="cloudBackupStatus" style="font-size:12px;margin:0 0 8px;color:var(--muted)">Listo</p>
@@ -815,14 +823,7 @@ body.skin-navidad .card{border-color:#1b5e20}
   </div>
   <input type="file" id="catCloudImportFile" accept="application/json,.json" style="display:none">
 </div>
-
-
-  <div id="adminLogin" class="admin-login">
-    <h2>Admin</h2>
-    <input type="password" id="adminPass" placeholder="Contraseña">
-    <button class="btn" onclick="loginAdmin()">Entrar</button>
-  </div>
-  <div id="adminPanel" class="admin-panel" style="display:none">
+<div id="adminPanel" class="admin-panel" style="display:none">
     <h2>Panel de gestión</h2>
     <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Toca cada título para abrir o cerrar el apartado.</p>
 
@@ -1420,7 +1421,7 @@ function showSection(id, btn) {
     renderProductTagsUI();
     document.getElementById("waNumber").value = config.wa || "";
     if (sessionStorage.getItem("lr_admin") === "1") {
-      document.getElementById("adminLogin").style.display = "none";
+      document.getElementById("adminLogin").style.display = "none"; try{var _cb=document.getElementById('cloudBackupBox'); if(_cb)_cb.style.display='block';}catch(e){};
       document.getElementById("adminPanel").style.display = "block";
       renderAdminProducts();
     } else {
@@ -1992,7 +1993,7 @@ function loginAdmin() {
   sha256Hex(pass).then(function(hash) {
     if (hash === getAdminHash()) {
       sessionStorage.setItem("lr_admin", "1");
-      document.getElementById("adminLogin").style.display = "none";
+      document.getElementById("adminLogin").style.display = "none"; try{var _cb=document.getElementById('cloudBackupBox'); if(_cb)_cb.style.display='block';}catch(e){};
       document.getElementById("adminPanel").style.display = "block";
       document.getElementById("waNumber").value = config.wa || "";
       revealAdminNav(true);

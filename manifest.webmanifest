@@ -1,13 +1,13 @@
 {
   "name": "Perfumes L&R Catalogo",
-  "short_name": "Perfumes L&R Catalogo",
-  "description": "Perfumes L&R Catalogo",
+  "short_name": "Perfumes L&R",
+  "description": "Fabricantes de lociones personales",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#000000",
-  "theme_color": "#000000",
+  "theme_color": "#1a0a14",
   "lang": "es",
   "icons": [
     {

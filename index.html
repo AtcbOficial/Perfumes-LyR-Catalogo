@@ -824,7 +824,7 @@ body.skin-navidad .card{border-color:#1b5e20}
     <button type="button" class="btn" id="btnCatCloudImport">⬆️ JSON → Firebase (restaurar)</button>
     <button type="button" class="btn" id="btnCatCloudReload">☁️ Recargar desde Firebase</button>
   </div>
-  <input type="file" id="catCloudImportFile" accept="application/json,.json" style="">
+  <input type="file" id="catCloudImportFile" accept="application/json,.json" style="display:none!important;position:absolute;width:0;height:0;opacity:0;pointer-events:none">
 </div>
 <h2>Panel de gestión</h2>
     <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Toca cada título para abrir o cerrar el apartado.</p>
@@ -906,7 +906,7 @@ body.skin-navidad .card{border-color:#1b5e20}
       <div class="tool-item-body">
         <div class="info-box">Sube un <strong style="color:var(--gold)">PNG (recomendado) o JPG</strong> y se actualiza para todos.</div>
         <label style="font-size:12px;color:var(--muted)">Link banner (https://…)</label>
-        <input type="url" id="bannerImgUrl" placeholder="https://… imagen pública del banner" style="width:100%;margin:6px 0;padding:10px;border-radius:8px;border:1px solid #333;background:#111;color:#eee">
+        <input type="url" id="bannerImgUrl" placeholder="https://… imagen pública del banner" onchange="previewBannerUrl()" oninput="previewBannerUrl()" style="width:100%;margin:6px 0;padding:10px;border-radius:8px;border:1px solid #333;background:#111;color:#eee">
         <div class="upload-box" style="display:none" onclick="document.getElementById('bannerFile').click()">
           <strong>🖼️ Cambiar banner de bienvenida</strong>
           <p>Toca aquí y elige el archivo</p>
@@ -2379,39 +2379,48 @@ var DEFAULT_BANNER = ""; /* sin archivo local: usa Firebase o texto de respaldo 
 
 function applyWelcomeBanner() {
   var img = document.getElementById("welcomeImg");
-  if (!img) return;
-  var src = (config && config.welcomeBanner) ? config.welcomeBanner : DEFAULT_BANNER;
   var fb = document.getElementById("welcomeFallback");
-  img.onerror = function() {
-    this.style.display = "none";
-    if (fb) fb.style.display = "block";
-  };
-  if (src) {
-    img.style.display = "block";
-    if (fb) fb.style.display = "none";
-    img.src = src;
-  } else {
-    img.removeAttribute("src");
-    img.style.display = "none";
-    if (fb) fb.style.display = "block";
-  }
-  /* Vista previa en admin si está abierto */
+  var src = (config && config.welcomeBanner) ? String(config.welcomeBanner) : (DEFAULT_BANNER || "");
+  var urlEl = document.getElementById("bannerImgUrl");
+  if (urlEl && src && src.indexOf("http") === 0 && !pendingBannerData) urlEl.value = src;
   var prev = document.getElementById("bannerPreview");
   var hint = document.getElementById("bannerHint");
   if (prev && !pendingBannerData) {
-    if (src) {
-      prev.src = src;
-      prev.classList.add("show");
-    } else {
-      prev.classList.remove("show");
-      prev.removeAttribute("src");
-    }
-    if (hint) hint.textContent = (config && config.welcomeBanner)
-      ? "Banner personalizado (guardado en Firebase)"
-      : "Sin banner en la nube — se muestra el texto de respaldo. Súbelo en Admin.";
+    if (src) { prev.src = src; prev.classList.add("show"); }
+    else { prev.removeAttribute("src"); prev.classList.remove("show"); }
   }
+  if (hint && !pendingBannerData) {
+    hint.textContent = src ? (src.indexOf("http")===0 ? "Banner en nube (link)" : "Banner en nube") : "Sin banner en la nube — se muestra el texto de respaldo.";
+  }
+  if (!img) return;
+  if (!src) {
+    img.style.display = "none";
+    img.removeAttribute("src");
+    if (fb) fb.style.display = "block";
+    return;
+  }
+  img.onload = function() {
+    img.style.display = "block";
+    if (fb) fb.style.display = "none";
+  };
+  img.onerror = function() {
+    img.style.display = "none";
+    if (fb) fb.style.display = "block";
+  };
+  img.src = src;
 }
 
+function previewBannerUrl() {
+  var urlEl = document.getElementById("bannerImgUrl");
+  var url = urlEl ? String(urlEl.value || "").trim() : "";
+  var prev = document.getElementById("bannerPreview");
+  var hint = document.getElementById("bannerHint");
+  if (!url) return;
+  if (url.indexOf("http") !== 0) { if (hint) hint.textContent = "El link debe ser https://…"; return; }
+  pendingBannerData = null;
+  if (prev) { prev.src = url; prev.classList.add("show"); }
+  if (hint) hint.textContent = "Link listo · pulsa Guardar banner";
+}
 function onBannerFile(ev) {
   var file = ev.target.files && ev.target.files[0];
   if (!file) return;
@@ -2456,9 +2465,15 @@ function compressBanner(src, cb) {
 }
 
 function saveWelcomeBanner() {
-  if (!pendingBannerData) return toast("Primero elige una imagen");
+  var urlEl = document.getElementById("bannerImgUrl");
+  var url = urlEl ? String(urlEl.value || "").trim() : "";
+  var banner = pendingBannerData || url || "";
+  if (!banner) return toast("Pega un link https del banner o elige una imagen");
+  if (!pendingBannerData && url && url.indexOf("http") !== 0) return toast("El link debe empezar por https://");
   var wa = (document.getElementById("waNumber").value || config.wa || "").trim();
-  var data = { wa: wa || (config.wa || "584120000000"), welcomeBanner: pendingBannerData };
+  var data = Object.assign({}, config || {});
+  data.wa = wa || (config && config.wa) || "584120000000";
+  data.welcomeBanner = banner;
   if (config && config.adminHash) data.adminHash = config.adminHash;
   if (config && config.flyerImage) data.flyerImage = config.flyerImage;
   if (config && config.socialLinks) data.socialLinks = config.socialLinks;
@@ -2467,11 +2482,13 @@ function saveWelcomeBanner() {
   if (config && config.availableSizes) data.availableSizes = config.availableSizes;
   if (config && config.defaultSize) data.defaultSize = config.defaultSize;
   if (config && config.extraTags) data.extraTags = config.extraTags;
+  if (config && config.skin) data.skin = config.skin;
   db.ref("config").set(data);
   config = data;
   pendingBannerData = null;
   var bf = document.getElementById("bannerFile");
   if (bf) bf.value = "";
+  if (urlEl && banner.indexOf("http") === 0) urlEl.value = banner;
   applyWelcomeBanner();
   toast("Banner actualizado");
 }

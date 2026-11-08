@@ -791,7 +791,7 @@ body.skin-navidad .card{border-color:#1b5e20}
 <section id="catalogo" class="section active">
   <div class="catalog-sticky" id="catalogSticky">
     <div class="search-bar">
-      <input type="text" id="search" placeholder="🔍 Nombre, código, familia u observaciones..." oninput="renderCatalog()">
+      <input type="text" id="search" placeholder="🔍 Nombre, código o familia olfativa..." oninput="renderCatalog()">
     </div>
     <div class="filters" id="filterBar">
       <button class="active" data-filter="all" onclick="setFilter('all',this)">Todos</button>
@@ -1694,8 +1694,7 @@ function renderCatalog() {
   var list = products.filter(function(p) {
     var matchQ = !q || (p.name || "").toLowerCase().includes(q)
       || (p.code || p.codigo || "").toLowerCase().includes(q)
-      || (p.familia || p.familiaOlfativa || "").toLowerCase().includes(q)
-      || (p.obs || p.observaciones || "").toLowerCase().includes(q);
+      || (p.familia || p.familiaOlfativa || "").toLowerCase().includes(q);
     var matchF = true;
     if (currentFilter === "all") matchF = true;
     else if (currentFilter === "promo") matchF = productHasTag(p, "masvendido");

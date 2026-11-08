@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🧴 Perfumes L&R Fabricantes de lociones personales</title>
+<title>PERFUMES L&R · ESENCIAS CON CALIDAD AL ORIGINAL</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#1a0a14">
@@ -15,21 +15,21 @@
 <meta name="application-name" content="Perfumes L&amp;R">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<meta name="description" content="PerfumesL&amp;R Somos Fabricante. Esencias con calidad al original 1.1 — 30 · 60 · 120 ml">
+<meta name="description" content="PERFUMES L&R · ESENCIAS CON CALIDAD AL ORIGINAL. Fabricantes de lociones personales">
 
 <!-- Vista previa al compartir (WhatsApp, Facebook, Telegram…) -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Perfumes L&amp;R">
-<meta property="og:title" content="🧴 Perfumes L&R Fabricantes de lociones personales">
-<meta property="og:description" content="Fabricantes de lociones personales · Réplicas 1.1 Premium · 30 · 60 · 120 ml · Colombia y Venezuela">
+<meta property="og:title" content="PERFUMES L&R · ESENCIAS CON CALIDAD AL ORIGINAL. Fabricantes de lociones personales">
+<meta property="og:description" content="ESENCIAS CON CALIDAD AL ORIGINAL. Fabricantes de lociones personales">
 <meta property="og:url" content="https://atcboficial.github.io/Perfumes-LyR-Catalogo/">
 <meta property="og:image" content="https://atcboficial.github.io/Perfumes-LyR-Catalogo/images/og-share.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="1176">
 <meta property="og:image:type" content="image/png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="🧴 Perfumes L&R Fabricantes de lociones personales">
-<meta name="twitter:description" content="Fabricantes de lociones personales · Réplicas 1.1 Premium · 30 · 60 · 120 ml · Colombia y Venezuela">
+<meta name="twitter:title" content="PERFUMES L&R · ESENCIAS CON CALIDAD AL ORIGINAL. Fabricantes de lociones personales">
+<meta name="twitter:description" content="ESENCIAS CON CALIDAD AL ORIGINAL. Fabricantes de lociones personales">
 <meta name="twitter:image" content="https://atcboficial.github.io/Perfumes-LyR-Catalogo/images/og-share.png">
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-database-compat.js"></script>
@@ -760,7 +760,7 @@ body.skin-navidad .card{border-color:#1b5e20}
     <div class="logo" id="logoTap" style="cursor:default;user-select:none">PERFUMES <span>L&R</span></div>
     <div class="social-icons" id="socialIcons"></div>
   </div>
-  <div class="tagline">ESENCIAS CON CALIDAD AL ORIGINAL 1.1 · 30 · 60 · 120 ml sede en COLOMBIA y en VENEZUELA</div>
+  <div class="tagline">ESENCIAS CON CALIDAD AL ORIGINAL. Fabricantes de lociones personales</div>
 </header>
 
 <!-- Publicidad emergente al abrir -->
@@ -782,7 +782,7 @@ body.skin-navidad .card{border-color:#1b5e20}
 <section id="catalogo" class="section active">
   <div class="catalog-sticky" id="catalogSticky">
     <div class="search-bar">
-      <input type="text" id="search" placeholder="🔍 Buscar nombre o código id..." oninput="renderCatalog()">
+      <input type="text" id="search" placeholder="🔍 Buscar nombre, código id o familia olfativa..." oninput="renderCatalog()">
     </div>
     <div class="filters" id="filterBar">
       <button class="active" data-filter="all" onclick="setFilter('all',this)">Todos</button>
@@ -994,6 +994,8 @@ body.skin-navidad .card{border-color:#1b5e20}
           <div class="grow">
             <label for="pName">Nombre del perfume</label>
             <input type="text" id="pName" placeholder="Ej: ARMAF ODYSSEY MANDARIN SKY">
+            <label style="font-size:12px;color:var(--muted)">Familia olfativa</label>
+            <input type="text" id="pFamilia" placeholder="Ej: amaderado, cítrico, dulce, fresco…">
           </div>
           <div class="code-wrap">
             <label for="pCode">Código ID</label>
@@ -1656,7 +1658,9 @@ function productInCart(id) {
 function renderCatalog() {
   var q = (document.getElementById("search").value || "").toLowerCase();
   var list = products.filter(function(p) {
-    var matchQ = (p.name || "").toLowerCase().includes(q) || (p.code || "").toLowerCase().includes(q);
+    var matchQ = !q || (p.name || "").toLowerCase().includes(q)
+      || (p.code || p.codigo || "").toLowerCase().includes(q)
+      || (p.familia || p.familiaOlfativa || "").toLowerCase().includes(q);
     var matchF = true;
     if (currentFilter === "all") matchF = true;
     else if (currentFilter === "promo") matchF = productHasTag(p, "masvendido");
@@ -1693,7 +1697,7 @@ function renderCatalog() {
           tagBadgesHtml(p) +
           (p.agotado ? '<span class="badge agotado">AGOTADO</span>' : '') +
         '</div>' +
-        '<div class="sizes-hint">' + sizesHintText() + '</div>' +
+        ((p.familia || p.familiaOlfativa) ? ('<div class="sizes-hint" style="color:var(--gold)">' + escapeHtml(p.familia || p.familiaOlfativa) + '</div>') : '') +
         '<div class="btns">' + btn + '</div>' +
       '</div></div>';
   }).join("");
@@ -2188,7 +2192,8 @@ function clearForm() {
   editingId = null;
   pendingImageData = null;
   document.getElementById("formTitle").textContent = "Agregar perfume";
-  document.getElementById("pName").value = "";
+  document.getElementById("pName").value = ""
+  var _pf = document.getElementById("pFamilia"); if (_pf) _pf.value = "";;
   var pc = document.getElementById("pCode"); if (pc) pc.value = "";
   document.getElementById("pImg").value = "";
   var pf = document.getElementById("pFile"); if (pf) pf.value = "";
@@ -2344,7 +2349,8 @@ function saveProduct() {
     if (dup) return toast('Código id "' + code + '" ya existe en: ' + (dup.name || "otro producto"));
     var pc = document.getElementById("pCode"); if (pc) pc.value = code;
   }
-  var payload = { name: name, gender: gender, promo: promo, agotado: agotado, tags: tags };
+  var familia = ((document.getElementById("pFamilia") || {}).value || "").trim();
+  var payload = { name: name, gender: gender, promo: promo, agotado: agotado, tags: tags, familia: familia };
   if (code) payload.code = code;
   else if (editingId) payload.code = null;
   if (img) payload.img = img;

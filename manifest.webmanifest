@@ -1,13 +1,13 @@
 {
-  "name": "Perfumes L&R Catalogo",
-  "short_name": "Perfumes L&R",
-  "description": "Fabricantes de lociones personales",
+  "name": "Luis Jose Bonilla & Empresas",
+  "short_name": "LJB Empresas",
+  "description": "Luis Jose Bonilla & Empresas",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#000000",
-  "theme_color": "#1a0a14",
+  "background_color": "#081c48",
+  "theme_color": "#081c48",
   "lang": "es",
   "icons": [
     {

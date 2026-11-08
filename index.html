@@ -153,7 +153,10 @@ h2{color:var(--gold);font-size:18px;margin-bottom:12px;border-bottom:1px solid #
 .badge.promo{background:var(--danger)}.badge.replica{background:#8e44ad}.badge.premium{background:var(--gold);color:#000}
 .sizes-hint{font-size:9px;color:var(--muted);margin-bottom:4px}
 .btns{margin-top:auto}
-.btns button.btn-pedir{
+.btn-eye{flex:0 0 auto;width:auto!important;padding:8px 10px;border-radius:8px;border:1px solid #2e3d4f;background:#1a2430;color:#c9a227;font-size:16px;cursor:pointer;animation:none!important;box-shadow:none}
+.btns{display:flex;gap:6px;align-items:stretch}
+.btns .btn-pedir{flex:1}
+.btn-pedir{
   width:100%;border:none;padding:11px 6px;border-radius:8px;font-size:15px;font-weight:900;
   cursor:pointer;background:var(--gold);color:#000;letter-spacing:.6px;
   text-transform:uppercase;
@@ -382,7 +385,10 @@ input,select,textarea{width:100%;background:var(--card);border:1px solid #333;co
 @media(min-width:600px){
   .card img,.card-img-wrap img{height:160px;padding:4px}
   .card-title{font-size:12px;min-height:32px}
-  .btns button.btn-pedir{font-size:16px;padding:13px 8px}
+  .btn-eye{flex:0 0 auto;width:auto!important;padding:8px 10px;border-radius:8px;border:1px solid #2e3d4f;background:#1a2430;color:#c9a227;font-size:16px;cursor:pointer;animation:none!important;box-shadow:none}
+.btns{display:flex;gap:6px;align-items:stretch}
+.btns .btn-pedir{flex:1}
+.btn-pedir{font-size:16px;padding:13px 8px}
 }
 @media(min-width:900px){
   .card img,.card-img-wrap img{height:190px}
@@ -549,7 +555,10 @@ input,select,textarea{width:100%;background:var(--card);border:1px solid #333;co
   100%{transform:translateY(110vh) rotate(360deg);opacity:0}
 }
 /* Botones Pedir y filtros activos: siempre dorado original (no cambian con skin) */
-body[class*="skin-"] .btns button.btn-pedir{
+body[class*="skin-"] .btn-eye{flex:0 0 auto;width:auto!important;padding:8px 10px;border-radius:8px;border:1px solid #2e3d4f;background:#1a2430;color:#c9a227;font-size:16px;cursor:pointer;animation:none!important;box-shadow:none}
+.btns{display:flex;gap:6px;align-items:stretch}
+.btns .btn-pedir{flex:1}
+.btn-pedir{
   background:#c9a227 !important;color:#000 !important;border-color:#c9a227 !important;
   box-shadow:0 2px 10px rgba(201,162,39,.35) !important;
 }
@@ -782,7 +791,7 @@ body.skin-navidad .card{border-color:#1b5e20}
 <section id="catalogo" class="section active">
   <div class="catalog-sticky" id="catalogSticky">
     <div class="search-bar">
-      <input type="text" id="search" placeholder="🔍 Buscar nombre, código id o familia olfativa..." oninput="renderCatalog()">
+      <input type="text" id="search" placeholder="🔍 Nombre, código, familia u observaciones..." oninput="renderCatalog()">
     </div>
     <div class="filters" id="filterBar">
       <button class="active" data-filter="all" onclick="setFilter('all',this)">Todos</button>
@@ -996,6 +1005,8 @@ body.skin-navidad .card{border-color:#1b5e20}
             <input type="text" id="pName" placeholder="Ej: ARMAF ODYSSEY MANDARIN SKY">
             <label style="font-size:12px;color:var(--muted)">Familia olfativa</label>
             <input type="text" id="pFamilia" placeholder="Ej: amaderado, cítrico, dulce, fresco…">
+            <label style="font-size:12px;color:var(--muted)">Observaciones (notas libres)</label>
+            <textarea id="pObs" placeholder="Notas libres del perfume…" style="min-height:56px;margin-bottom:6px"></textarea>
           </div>
           <div class="code-wrap">
             <label for="pCode">Código ID</label>
@@ -1655,12 +1666,36 @@ function removeCartItem(i) {
 function productInCart(id) {
   return (cart || []).some(function(c){ return sameId(c.id, id); });
 }
+function viewPerfumeObs(id) {
+  var p = (products || []).find(function(x){ return String(x.id) === String(id); });
+  if (!p) return toast("No encontrado");
+  var fam = p.familia || p.familiaOlfativa || "—";
+  var obs = p.obs || p.observaciones || "";
+  var html = "<div style=\"text-align:left\"><div style=\"margin-bottom:8px\"><strong>👃 Familia olfativa</strong><br>" +
+    escapeHtml(fam) + "</div>";
+  html += "<div><strong>📝 Observaciones</strong><br>" +
+    (obs ? escapeHtml(obs).replace(/\n/g,"<br>") : "<span style=\"color:#888\">Sin notas</span>") + "</div></div>";
+  // simple modal reuse or alert
+  var m = document.getElementById("obsModal");
+  if (!m) {
+    m = document.createElement("div");
+    m.id = "obsModal";
+    m.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px";
+    m.innerHTML = '<div style="background:#121922;border:1px solid #2e3d4f;border-radius:14px;padding:16px;max-width:420px;width:100%;color:#edf3f8"><div id="obsModalTitle" style="font-weight:700;margin-bottom:10px;color:#c9a227"></div><div id="obsModalBody"></div><button type="button" onclick="document.getElementById(\'obsModal\').style.display=\'none\'" style="margin-top:14px;width:100%;padding:10px;border-radius:10px;border:0;background:#2ecc71;color:#0b0f14;font-weight:700">Cerrar</button></div>';
+    m.onclick = function(e){ if (e.target === m) m.style.display = "none"; };
+    document.body.appendChild(m);
+  }
+  document.getElementById("obsModalTitle").textContent = p.name || "Detalle";
+  document.getElementById("obsModalBody").innerHTML = html;
+  m.style.display = "flex";
+}
 function renderCatalog() {
   var q = (document.getElementById("search").value || "").toLowerCase();
   var list = products.filter(function(p) {
     var matchQ = !q || (p.name || "").toLowerCase().includes(q)
       || (p.code || p.codigo || "").toLowerCase().includes(q)
-      || (p.familia || p.familiaOlfativa || "").toLowerCase().includes(q);
+      || (p.familia || p.familiaOlfativa || "").toLowerCase().includes(q)
+      || (p.obs || p.observaciones || "").toLowerCase().includes(q);
     var matchF = true;
     if (currentFilter === "all") matchF = true;
     else if (currentFilter === "promo") matchF = productHasTag(p, "masvendido");
@@ -1698,7 +1733,9 @@ function renderCatalog() {
           (p.agotado ? '<span class="badge agotado">AGOTADO</span>' : '') +
         '</div>' +
         ((p.familia || p.familiaOlfativa) ? ('<div class="sizes-hint" style="color:var(--gold)">' + escapeHtml(p.familia || p.familiaOlfativa) + '</div>') : '') +
-        '<div class="btns">' + btn + '</div>' +
+        '<div class="btns">' + btn +
+          '<button type="button" class="btn-eye" onclick="event.stopPropagation();viewPerfumeObs(\'' + String(p.id).replace(/'/g, '') + '\')" title="Familia y observaciones">👀</button>' +
+        '</div>' +
       '</div></div>';
   }).join("");
 }
@@ -2193,7 +2230,8 @@ function clearForm() {
   pendingImageData = null;
   document.getElementById("formTitle").textContent = "Agregar perfume";
   document.getElementById("pName").value = ""
-  var _pf = document.getElementById("pFamilia"); if (_pf) _pf.value = "";;
+  var _pf = document.getElementById("pFamilia"); if (_pf) _pf.value = "";
+  var _po = document.getElementById("pObs"); if (_po) _po.value = "";;
   var pc = document.getElementById("pCode"); if (pc) pc.value = "";
   document.getElementById("pImg").value = "";
   var pf = document.getElementById("pFile"); if (pf) pf.value = "";
@@ -2251,11 +2289,15 @@ function importFromControlJSON() {
           return normCodigoCat(p.code) === normCodigoCat(codigo);
         });
         if (found) {
-          /* Actualización: SOLO nombre + imagen (+ código). NO se tocan tags ni género ni agotado */
+          /* Actualización: SOLO nombre, código, imagen, familia, obs. NO borra tags ni género ni agotado */
+          var familia = String(it.familia || it.familiaOlfativa || "").trim();
+          var obsIn = String(it.obs || it.observaciones || "").trim();
           var payload = {};
           if (nombre) payload.name = nombre;
           payload.code = codigo;
           if (imgData) payload.img = imgData;
+          if (familia) payload.familia = familia;
+          if (obsIn) payload.obs = obsIn;
           db.ref("products/" + found.id).update(payload, function(err) {
             if (err) console.warn(err);
             else {
@@ -2264,6 +2306,8 @@ function importFromControlJSON() {
                 if (nombre) found.name = nombre;
                 found.code = codigo;
                 if (imgData) found.img = imgData;
+                if (familia) found.familia = familia;
+                if (obsIn) found.obs = obsIn;
                 /* tags, gender, promo, agotado se mantienen */
               } catch (e2) {}
             }
@@ -2271,6 +2315,8 @@ function importFromControlJSON() {
           });
         } else {
           var newId = Date.now() + i;
+          var familia = String(it.familia || it.familiaOlfativa || "").trim();
+          var obsIn = String(it.obs || it.observaciones || "").trim();
           var payload = {
             id: newId,
             name: nombre || codigo,
@@ -2278,7 +2324,9 @@ function importFromControlJSON() {
             gender: "",
             promo: false,
             agotado: false,
-            tags: ["import"]
+            tags: ["import"],
+            familia: familia || "",
+            obs: obsIn || ""
           };
           if (imgData) payload.img = imgData;
           db.ref("products/" + newId).set(payload, function(err) {
@@ -2350,7 +2398,8 @@ function saveProduct() {
     var pc = document.getElementById("pCode"); if (pc) pc.value = code;
   }
   var familia = ((document.getElementById("pFamilia") || {}).value || "").trim();
-  var payload = { name: name, gender: gender, promo: promo, agotado: agotado, tags: tags, familia: familia };
+  var obs = ((document.getElementById("pObs") || {}).value || "").trim();
+  var payload = { name: name, gender: gender, promo: promo, agotado: agotado, tags: tags, familia: familia, obs: obs };
   if (code) payload.code = code;
   else if (editingId) payload.code = null;
   if (img) payload.img = img;

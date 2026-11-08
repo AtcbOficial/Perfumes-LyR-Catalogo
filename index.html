@@ -153,13 +153,13 @@ h2{color:var(--gold);font-size:18px;margin-bottom:12px;border-bottom:1px solid #
 .badge.promo{background:var(--danger)}.badge.replica{background:#8e44ad}.badge.premium{background:var(--gold);color:#000}
 .sizes-hint{font-size:9px;color:var(--muted);margin-bottom:4px}
 .btns{margin-top:auto}
-.btn-eye{flex:0 0 auto;width:auto!important;padding:8px 10px;border-radius:8px;border:1px solid #2e3d4f;background:#1a2430;color:#c9a227;font-size:16px;cursor:pointer;animation:none!important;box-shadow:none}
+.btn-eye{flex:0 0 auto;width:auto!important;padding:10px 12px;border-radius:10px;border:1px solid #1e4d3a;background:#14352a;color:#3ddc97;font-size:18px;cursor:pointer;animation:none!important;box-shadow:0 2px 10px rgba(61,220,151,.25)}
 .btns{display:flex;gap:6px;align-items:stretch}
 .btns .btn-pedir{flex:1}
 .btn-pedir{
-  width:100%;border:none;padding:11px 6px;border-radius:8px;font-size:15px;font-weight:900;
-  cursor:pointer;background:var(--gold);color:#000;letter-spacing:.6px;
-  text-transform:uppercase;
+  width:100%;border:none;padding:12px 8px;border-radius:10px;font-size:16px;font-weight:900;
+  cursor:pointer;background:var(--gold);color:#000;letter-spacing:.4px;
+  text-transform:none;
   animation:addPulse 1.4s ease-in-out infinite;
   box-shadow:0 3px 14px rgba(201,162,39,.45);
   transition:transform .15s,box-shadow .15s;
@@ -385,7 +385,7 @@ input,select,textarea{width:100%;background:var(--card);border:1px solid #333;co
 @media(min-width:600px){
   .card img,.card-img-wrap img{height:160px;padding:4px}
   .card-title{font-size:12px;min-height:32px}
-  .btn-eye{flex:0 0 auto;width:auto!important;padding:8px 10px;border-radius:8px;border:1px solid #2e3d4f;background:#1a2430;color:#c9a227;font-size:16px;cursor:pointer;animation:none!important;box-shadow:none}
+  .btn-eye{flex:0 0 auto;width:auto!important;padding:10px 12px;border-radius:10px;border:1px solid #1e4d3a;background:#14352a;color:#3ddc97;font-size:18px;cursor:pointer;animation:none!important;box-shadow:0 2px 10px rgba(61,220,151,.25)}
 .btns{display:flex;gap:6px;align-items:stretch}
 .btns .btn-pedir{flex:1}
 .btn-pedir{font-size:16px;padding:13px 8px}
@@ -555,7 +555,7 @@ input,select,textarea{width:100%;background:var(--card);border:1px solid #333;co
   100%{transform:translateY(110vh) rotate(360deg);opacity:0}
 }
 /* Botones Pedir y filtros activos: siempre dorado original (no cambian con skin) */
-body[class*="skin-"] .btn-eye{flex:0 0 auto;width:auto!important;padding:8px 10px;border-radius:8px;border:1px solid #2e3d4f;background:#1a2430;color:#c9a227;font-size:16px;cursor:pointer;animation:none!important;box-shadow:none}
+body[class*="skin-"] .btn-eye{flex:0 0 auto;width:auto!important;padding:10px 12px;border-radius:10px;border:1px solid #1e4d3a;background:#14352a;color:#3ddc97;font-size:18px;cursor:pointer;animation:none!important;box-shadow:0 2px 10px rgba(61,220,151,.25)}
 .btns{display:flex;gap:6px;align-items:stretch}
 .btns .btn-pedir{flex:1}
 .btn-pedir{
@@ -1315,7 +1315,7 @@ function loadFromFirebase() {
     renderTagsAdmin();
     renderProductTagsUI();
     if (document.getElementById("catalogo") && document.getElementById("catalogo").classList.contains("active")) {
-      try { renderCatalog(); } catch (e) {}
+      try { renderFilterBar(); renderCatalog(); } catch (e) {}
     }
     var waEl = document.getElementById("waNumber");
     if (waEl && sessionStorage.getItem("lr_admin") === "1") {
@@ -1552,13 +1552,26 @@ function shareCatalog(ev) {
 function tagBadgesHtml(p) {
   var tags = Array.isArray(p.tags) ? p.tags.slice() : [];
   if (p.promo && tags.indexOf("masvendido") === -1 && tags.indexOf("promo") === -1) tags.unshift("masvendido");
+  // Derive gender tag if missing
+  var g = String(p.gender || "").toLowerCase();
+  var n = String(p.name || "").toLowerCase();
+  if (tags.indexOf("dama") === -1 && tags.indexOf("caballero") === -1 && tags.indexOf("unisex") === -1) {
+    if (g === "dama" || n.indexOf("dama") >= 0) tags.push("dama");
+    else if (g === "caballero" || n.indexOf("caballero") >= 0) tags.push("caballero");
+    else if (g === "unisex" || n.indexOf("unisex") >= 0) tags.push("unisex");
+  }
   if (!tags.length) return "";
   var map = {};
-  getExtraTags().forEach(function(t){ map[t.id] = t; map["promo"] = map["promo"] || { id: "promo", label: "Lo Más Vendido", color: "#c9a227" }; });
-  if (!map.masvendido) map.masvendido = { id: "masvendido", label: "Lo Más Vendido", color: "#c9a227" };
+  getExtraTags().forEach(function(t){ map[t.id] = t; });
+  map["promo"] = map["promo"] || { id: "promo", label: "Lo Más Vendido", color: "#c9a227" };
+  map["masvendido"] = map["masvendido"] || { id: "masvendido", label: "Lo Más Vendido", color: "#c9a227" };
+  map["dama"] = map["dama"] || { id: "dama", label: "Dama", color: "#e91e63" };
+  map["caballero"] = map["caballero"] || { id: "caballero", label: "Caballero", color: "#2196f3" };
+  map["unisex"] = map["unisex"] || { id: "unisex", label: "Unisex", color: "#9c27b0" };
+  map["import"] = map["import"] || { id: "import", label: "Importado", color: "#607d8b" };
   return tags.map(function(id) {
     var t = map[id] || (id === "promo" ? map.masvendido : null);
-    if (!t) return "";
+    if (!t) return '<span class="badge" style="background:#555;color:#fff">' + escapeHtml(String(id)) + '</span>';
     var col = t.color || "#c9a227";
     return '<span class="badge" style="background:' + col + ';color:#fff">' + escapeHtml(t.label) + '</span>';
   }).join("");
@@ -1671,22 +1684,36 @@ function viewPerfumeObs(id) {
   if (!p) return toast("No encontrado");
   var fam = p.familia || p.familiaOlfativa || "—";
   var obs = p.obs || p.observaciones || "";
-  var html = "<div style=\"text-align:left\"><div style=\"margin-bottom:8px\"><strong>👃 Familia olfativa</strong><br>" +
-    escapeHtml(fam) + "</div>";
-  html += "<div><strong>📝 Observaciones</strong><br>" +
-    (obs ? escapeHtml(obs).replace(/\n/g,"<br>") : "<span style=\"color:#888\">Sin notas</span>") + "</div></div>";
-  // simple modal reuse or alert
+  var code = p.code || p.codigo || "—";
   var m = document.getElementById("obsModal");
   if (!m) {
     m = document.createElement("div");
     m.id = "obsModal";
-    m.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px";
-    m.innerHTML = '<div style="background:#121922;border:1px solid #2e3d4f;border-radius:14px;padding:16px;max-width:420px;width:100%;color:#edf3f8"><div id="obsModalTitle" style="font-weight:700;margin-bottom:10px;color:#c9a227"></div><div id="obsModalBody"></div><button type="button" onclick="document.getElementById(\'obsModal\').style.display=\'none\'" style="margin-top:14px;width:100%;padding:10px;border-radius:10px;border:0;background:#2ecc71;color:#0b0f14;font-weight:700">Cerrar</button></div>';
+    m.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px";
+    m.innerHTML = '<div style="background:#121922;border:1px solid #2e3d4f;border-radius:16px;padding:16px;max-width:440px;width:100%;color:#edf3f8;max-height:90vh;overflow:auto">' +
+      '<div id="obsModalTitle" style="font-weight:700;margin-bottom:10px;color:#c9a227;font-size:16px"></div>' +
+      '<div id="obsModalBody"></div>' +
+      '<div id="obsModalActions" style="display:flex;gap:8px;margin-top:14px"></div>' +
+      '</div>';
     m.onclick = function(e){ if (e.target === m) m.style.display = "none"; };
     document.body.appendChild(m);
   }
   document.getElementById("obsModalTitle").textContent = p.name || "Detalle";
+  var img = (p.img && String(p.img).indexOf("http") === 0) ? p.img : "";
+  var html = "";
+  if (img) html += '<div style="text-align:center;margin-bottom:12px"><img src="' + img + '" alt="" style="max-width:100%;max-height:200px;border-radius:12px;border:1px solid #2e3d4f;object-fit:contain" onerror="this.style.display=\'none\'"></div>';
+  html += '<div style="margin-bottom:8px">🪪 <strong>Código id:</strong> ' + escapeHtml(String(code)) + '</div>';
+  html += '<div style="margin-bottom:8px">👃 <strong>Familia olfativa:</strong> ' + escapeHtml(fam) + '</div>';
+  html += '<div style="margin-bottom:8px">🧴 <strong>Capacidades:</strong> ' + escapeHtml(sizesHintText()) + '</div>';
+  html += '<div style="margin-bottom:4px">📝 <strong>Observaciones</strong></div>';
+  html += '<div style="white-space:pre-wrap;line-height:1.45;color:#c5d0da;margin-bottom:8px">' + (obs ? escapeHtml(obs) : '<span style="color:#888">Sin notas</span>') + '</div>';
+  html += '<div style="margin-top:8px">' + tagBadgesHtml(p) + '</div>';
   document.getElementById("obsModalBody").innerHTML = html;
+  var acts = document.getElementById("obsModalActions");
+  var canAdd = !p.agotado;
+  acts.innerHTML =
+    (canAdd ? '<button type="button" style="flex:1;padding:12px;border:0;border-radius:10px;background:#c9a227;color:#0b0f14;font-weight:900;font-size:15px" onclick="document.getElementById(\'obsModal\').style.display=\'none\';openAddModal(\'' + String(p.id).replace(/'/g, '') + '\')">🛒 Agregar</button>' : '') +
+    '<button type="button" style="flex:1;padding:12px;border:0;border-radius:10px;background:#2a3544;color:#edf3f8;font-weight:700" onclick="document.getElementById(\'obsModal\').style.display=\'none\'">Cerrar</button>';
   m.style.display = "flex";
 }
 function renderCatalog() {
@@ -1718,7 +1745,7 @@ function renderCatalog() {
     var safeGender = escapeHtml(p.gender || "");
     var btn = p.agotado
       ? '<button class="disabled-agotado" disabled>Agotado</button>'
-      : '<button type="button" class="btn-pedir" onclick="openAddModal(\'' + String(p.id).replace(/'/g, '') + '\', this)">Pedir</button>';
+      : '<button type="button" class="btn-pedir" onclick="openAddModal(\'' + String(p.id).replace(/'/g, '') + '\', this)">🛒 Agregar</button>';
     return '<div class="card">' +
       '<div class="card-img-wrap">' +
         '<img src="' + imgSrc(p.img) + '" alt="' + safeName + '" loading="lazy" onerror="this.src=\'' + imgFallback() + '\'">' +
@@ -1731,7 +1758,8 @@ function renderCatalog() {
           tagBadgesHtml(p) +
           (p.agotado ? '<span class="badge agotado">AGOTADO</span>' : '') +
         '</div>' +
-        ((p.familia || p.familiaOlfativa) ? ('<div class="sizes-hint" style="color:var(--gold)">' + escapeHtml(p.familia || p.familiaOlfativa) + '</div>') : '') +
+        ((p.familia || p.familiaOlfativa) ? ('<div class="sizes-hint" style="color:var(--gold)">👃 ' + escapeHtml(p.familia || p.familiaOlfativa) + '</div>') : '') +
+        '<div class="sizes-hint">🧴 ' + sizesHintText() + '</div>' +
         '<div class="btns">' + btn +
           '<button type="button" class="btn-eye" onclick="event.stopPropagation();viewPerfumeObs(\'' + String(p.id).replace(/'/g, '') + '\')" title="Familia y observaciones">👀</button>' +
         '</div>' +
@@ -2623,14 +2651,29 @@ function productHasTag(p, tagId) {
     if (p.promo) return true;
     return Array.isArray(p.tags) && (p.tags.indexOf("masvendido") !== -1 || p.tags.indexOf("promo") !== -1);
   }
-  return Array.isArray(p.tags) && p.tags.indexOf(tagId) !== -1;
+  if (Array.isArray(p.tags) && p.tags.indexOf(tagId) !== -1) return true;
+  // fallback: gender field or name
+  var g = String(p.gender || "").toLowerCase();
+  var n = String(p.name || "").toLowerCase();
+  if (tagId === "dama" && (g === "dama" || n.indexOf("dama") >= 0 || g === "mujer")) return true;
+  if (tagId === "caballero" && (g === "caballero" || n.indexOf("caballero") >= 0 || g === "hombre" || n.indexOf(" man") >= 0)) return true;
+  if (tagId === "unisex" && (g === "unisex" || n.indexOf("unisex") >= 0)) return true;
+  return false;
 }
 function renderFilterBar() {
   var bar = document.getElementById("filterBar");
   if (!bar) return;
   var active = currentFilter || "all";
-  var items = [{ f: "all", label: "Todos" }];
+  var items = [
+    { f: "all", label: "Todos" },
+    { f: "tag:dama", label: "Dama", color: "#e91e63" },
+    { f: "tag:caballero", label: "Caballero", color: "#2196f3" },
+    { f: "tag:unisex", label: "Unisex", color: "#9c27b0" },
+    { f: "promo", label: "Más vendido", color: "#c9a227" }
+  ];
   getExtraTags().forEach(function(t) {
+    var id = String(t.id || "").toLowerCase();
+    if (id === "dama" || id === "caballero" || id === "unisex" || id === "masvendido" || id === "promo") return;
     items.push({ f: "tag:" + t.id, label: t.label, color: t.color });
   });
   bar.innerHTML = items.map(function(b) {

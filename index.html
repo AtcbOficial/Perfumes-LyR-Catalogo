@@ -120,7 +120,7 @@ h2{color:var(--gold);font-size:18px;margin-bottom:12px;border-bottom:1px solid #
   outline:none;border-color:var(--gold);
   box-shadow:0 0 0 2px rgba(201,162,39,.28);
 }
-.filters{display:flex;gap:5px;overflow-x:auto;overflow-y:hidden;padding-bottom:1px;margin-bottom:0;-webkit-overflow-scrolling:touch;scrollbar-width:none;-webkit-transform:translateZ(0)}
+.filters{display:flex;flex-wrap:wrap;gap:5px;overflow-x:auto;overflow-y:hidden;padding-bottom:2px;margin-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .filters::-webkit-scrollbar{display:none}
 .filters button{
   background:#1a1a1a;border:1px solid #333;color:var(--muted);
@@ -153,17 +153,16 @@ h2{color:var(--gold);font-size:18px;margin-bottom:12px;border-bottom:1px solid #
 .badge.promo{background:var(--danger)}.badge.replica{background:#8e44ad}.badge.premium{background:var(--gold);color:#000}
 .sizes-hint{font-size:9px;color:var(--muted);margin-bottom:4px}
 .btns{margin-top:auto}
-.btn-eye{flex:0 0 auto;width:auto!important;padding:10px 12px;border-radius:10px;border:1px solid #1e4d3a;background:#14352a;color:#3ddc97;font-size:18px;cursor:pointer;animation:none!important;box-shadow:0 2px 10px rgba(61,220,151,.25)}
-.btns{display:flex;gap:6px;align-items:stretch}
-.btns .btn-pedir{flex:1}
+.btn-eye{flex:0 0 auto;width:auto!important;min-width:36px;padding:6px 8px;border-radius:8px;border:1px solid #1e4d3a;background:#14352a;color:#3ddc97;font-size:14px;line-height:1;cursor:pointer;animation:none!important;box-shadow:none}
+.btns{display:flex;gap:5px;align-items:center;margin-top:6px}
+.btns .btn-pedir{flex:1;min-height:0}
 .btn-pedir{
-  width:100%;border:none;padding:12px 8px;border-radius:10px;font-size:16px;font-weight:900;
-  cursor:pointer;background:var(--gold);color:#000;letter-spacing:.4px;
-  text-transform:none;
-  animation:addPulse 1.4s ease-in-out infinite;
-  box-shadow:0 3px 14px rgba(201,162,39,.45);
-  transition:transform .15s,box-shadow .15s;
-  line-height:1.15;
+  width:100%;border:none;padding:7px 6px;border-radius:8px;font-size:12px;font-weight:800;
+  cursor:pointer;background:var(--gold);color:#000;letter-spacing:0;
+  text-transform:none;line-height:1.2;
+  box-shadow:0 2px 8px rgba(201,162,39,.35);
+  transition:transform .12s,box-shadow .12s;
+  animation:none;
 }
 .btns button.btn-pedir:active{transform:scale(.94)}
 .btns button.disabled-agotado{
@@ -385,10 +384,10 @@ input,select,textarea{width:100%;background:var(--card);border:1px solid #333;co
 @media(min-width:600px){
   .card img,.card-img-wrap img{height:160px;padding:4px}
   .card-title{font-size:12px;min-height:32px}
-  .btn-eye{flex:0 0 auto;width:auto!important;padding:10px 12px;border-radius:10px;border:1px solid #1e4d3a;background:#14352a;color:#3ddc97;font-size:18px;cursor:pointer;animation:none!important;box-shadow:0 2px 10px rgba(61,220,151,.25)}
-.btns{display:flex;gap:6px;align-items:stretch}
-.btns .btn-pedir{flex:1}
-.btn-pedir{font-size:16px;padding:13px 8px}
+  .btn-eye{flex:0 0 auto;width:auto!important;min-width:36px;padding:6px 8px;border-radius:8px;border:1px solid #1e4d3a;background:#14352a;color:#3ddc97;font-size:14px;line-height:1;cursor:pointer;animation:none!important;box-shadow:none}
+.btns{display:flex;gap:5px;align-items:center;margin-top:6px}
+.btns .btn-pedir{flex:1;min-height:0}
+.btn-pedir{font-size:12px;padding:7px 6px}
 }
 @media(min-width:900px){
   .card img,.card-img-wrap img{height:190px}
@@ -555,9 +554,9 @@ input,select,textarea{width:100%;background:var(--card);border:1px solid #333;co
   100%{transform:translateY(110vh) rotate(360deg);opacity:0}
 }
 /* Botones Pedir y filtros activos: siempre dorado original (no cambian con skin) */
-body[class*="skin-"] .btn-eye{flex:0 0 auto;width:auto!important;padding:10px 12px;border-radius:10px;border:1px solid #1e4d3a;background:#14352a;color:#3ddc97;font-size:18px;cursor:pointer;animation:none!important;box-shadow:0 2px 10px rgba(61,220,151,.25)}
-.btns{display:flex;gap:6px;align-items:stretch}
-.btns .btn-pedir{flex:1}
+body[class*="skin-"] .btn-eye{flex:0 0 auto;width:auto!important;min-width:36px;padding:6px 8px;border-radius:8px;border:1px solid #1e4d3a;background:#14352a;color:#3ddc97;font-size:14px;line-height:1;cursor:pointer;animation:none!important;box-shadow:none}
+.btns{display:flex;gap:5px;align-items:center;margin-top:6px}
+.btns .btn-pedir{flex:1;min-height:0}
 .btn-pedir{
   background:#c9a227 !important;color:#000 !important;border-color:#c9a227 !important;
   box-shadow:0 2px 10px rgba(201,162,39,.35) !important;
@@ -1299,24 +1298,19 @@ function loadFromFirebase() {
     else config = config || {};
     /* Solo la primera vez: si no hay etiquetas guardadas, cargar las de fábrica */
     if (!config.extraTags || !Array.isArray(config.extraTags) || !config.extraTags.length) {
-      if (!config._tagsSeeded) {
-        config.extraTags = defaultExtraTags();
-        config._tagsSeeded = true;
-        var seedData = Object.assign({}, config);
-        db.ref("config").update({ extraTags: seedData.extraTags, _tagsSeeded: true });
-      }
+      config.extraTags = defaultExtraTags();
+      config._tagsSeeded = true;
+      try { db.ref("config").update({ extraTags: config.extraTags, _tagsSeeded: true }); } catch (eSeed) {}
     }
     applyWelcomeBanner();
     applySkin(getSkin());
     refreshFlyerUserView();
     renderSocialIcons();
     applyCatalogOptionsUI();
-    renderFilterBar();
-    renderTagsAdmin();
-    renderProductTagsUI();
-    if (document.getElementById("catalogo") && document.getElementById("catalogo").classList.contains("active")) {
-      try { renderFilterBar(); renderCatalog(); } catch (e) {}
-    }
+    try { renderFilterBar(); } catch (eF) {}
+    try { renderTagsAdmin(); } catch (eT) {}
+    try { renderProductTagsUI(); } catch (eP) {}
+    try { renderFilterBar(); renderCatalog(); } catch (e) {}
     var waEl = document.getElementById("waNumber");
     if (waEl && sessionStorage.getItem("lr_admin") === "1") {
       waEl.value = (config && config.wa) || "";
@@ -2660,6 +2654,8 @@ function productHasTag(p, tagId) {
   if (tagId === "unisex" && (g === "unisex" || n.indexOf("unisex") >= 0)) return true;
   return false;
 }
+/* boot filters */
+try { document.addEventListener('DOMContentLoaded', function(){ try { renderFilterBar(); } catch(e){} }); } catch(e){}
 function renderFilterBar() {
   var bar = document.getElementById("filterBar");
   if (!bar) return;
@@ -2758,7 +2754,7 @@ function recolorExtraTag(i, color) {
   renderTagsAdmin();
   renderFilterBar();
   if (document.getElementById("catalogo") && document.getElementById("catalogo").classList.contains("active")) {
-    try { renderCatalog(); } catch (e) {}
+    try { renderFilterBar(); renderCatalog(); } catch (e) {}
   }
   if (document.getElementById("adminProducts")) renderAdminProducts();
   toast("Color actualizado");

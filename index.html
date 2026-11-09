@@ -715,6 +715,14 @@ body.skin-navidad .card{border-color:#1b5e20}
 }
 
 
+
+/* Ajuste exclusivo del modal de detalle: barra de acciones fija y contenido desplazable */
+@media (max-width:600px){
+  #obsModal{padding:calc(8px + env(safe-area-inset-top, 0px)) 8px calc(8px + env(safe-area-inset-bottom, 0px)) !important;}
+  #obsModal > div{width:100% !important;max-width:100% !important;border-radius:14px !important;padding:12px !important;max-height:calc(100dvh - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;}
+  #obsModalActions button{min-height:44px;touch-action:manipulation;}
+}
+@media (min-width:601px){#obsModal > div{max-height:calc(100dvh - 40px) !important;}}
 </style>
 </head>
 <body>
@@ -1695,11 +1703,11 @@ function viewPerfumeObs(id) {
   if (!m) {
     m = document.createElement("div");
     m.id = "obsModal";
-    m.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:max(56px, calc(12px + env(safe-area-inset-top, 0px))) 12px 24px;overflow:auto;-webkit-overflow-scrolling:touch";
-    m.innerHTML = '<div style="background:#121922;border:1px solid #2e3d4f;border-radius:16px;padding:16px;max-width:440px;width:100%;color:#edf3f8;max-height:min(82vh, 720px);overflow:auto;margin:0 auto;box-shadow:0 12px 40px rgba(0,0,0,.55)">' +
-      '<div id="obsModalTitle" style="font-weight:700;margin-bottom:10px;color:#c9a227;font-size:16px"></div>' +
-      '<div id="obsModalBody"></div>' +
-      '<div id="obsModalActions" style="display:flex;gap:8px;margin-top:14px"></div>' +
+    m.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:10070;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:calc(10px + env(safe-area-inset-top, 0px)) 12px calc(10px + env(safe-area-inset-bottom, 0px));overflow:hidden";
+    m.innerHTML = '<div style="background:#121922;border:1px solid #2e3d4f;border-radius:16px;padding:14px 16px 16px;max-width:520px;width:100%;color:#edf3f8;height:auto;max-height:calc(100dvh - 20px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));display:flex;flex-direction:column;overflow:hidden;margin:0 auto;box-shadow:0 12px 40px rgba(0,0,0,.65);box-sizing:border-box">' +
+      '<div id="obsModalActions" style="display:flex;gap:8px;flex-shrink:0;position:sticky;top:0;z-index:2;background:#121922;padding:0 0 12px;margin:0 0 10px;border-bottom:1px solid #2e3d4f"></div>' +
+      '<div id="obsModalTitle" style="font-weight:800;margin:0 0 12px;color:#c9a227;font-size:17px;line-height:1.3;flex-shrink:0"></div>' +
+      '<div id="obsModalBody" style="min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-right:2px;line-height:1.45"></div>' +
       '</div>';
     m.onclick = function(e){ if (e.target === m) m.style.display = "none"; };
     document.body.appendChild(m);

@@ -842,20 +842,30 @@ body.skin-navidad .card{border-color:#1b5e20}
     <p class="hint" style="margin-top:10px;font-size:12px;color:var(--muted)">Firebase nuevo: usa la clave inicial <strong style="color:var(--gold)">Lr&amp;R2026!</strong> y luego cámbiala en el panel.</p>
   </div>
 <div id="adminPanel" class="admin-panel" style="display:none">
-    
-<div id="cloudBackupBox" class="card" style="margin:12px 0;padding:14px;border:1px solid var(--gold);border-radius:12px;background:#141414">
-  <div style="font-weight:700;color:var(--gold);margin-bottom:6px">☁️ Firebase (nube) y sus herramientas</div>
-  <p style="font-size:12px;color:var(--muted);margin:0 0 8px">Respaldo <strong>TOTAL</strong> del catálogo: productos, config (WA, skin, banner, flyer, clave, etiquetas, capacidades) y más. JSON portable. Imágenes = links https (.png preferido).</p>
-  <p id="cloudBackupStatus" style="font-size:12px;margin:0 0 8px;color:var(--muted)">Listo</p>
-  <div style="display:grid;gap:8px">
-    <button type="button" class="btn" id="btnCatCloudExport" style="background:var(--gold);color:#000">⬇️ Firebase → JSON (respaldo total)</button>
-    <button type="button" class="btn" id="btnCatCloudImport">⬆️ JSON → Firebase (restaurar)</button>
-    <button type="button" class="btn" id="btnCatCloudReload">☁️ Recargar desde Firebase</button>
-  </div>
-  <input type="file" id="catCloudImportFile" accept="application/json,.json" style="display:none!important;position:absolute;width:0;height:0;opacity:0;pointer-events:none">
-</div>
 <h2>Panel de gestión</h2>
     <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Toca cada título para abrir o cerrar el apartado.</p>
+
+    <!-- 0. Firebase nube -->
+    <div class="tool-item" id="admCloud">
+      <button type="button" class="tool-item-head" onclick="toggleAdminTool('admCloud')">
+        <span>☁️ Firebase (nube) y sus herramientas
+          <small>Respaldo total JSON · importar / exportar / recargar</small>
+        </span>
+        <span class="chev">›</span>
+      </button>
+      <div class="tool-item-body">
+        <div id="cloudBackupBox" style="margin:0;padding:0;border:none;background:transparent">
+          <p style="font-size:12px;color:var(--muted);margin:0 0 8px">Respaldo <strong>TOTAL</strong> del catálogo: productos, config (WA, skin, banner, flyer, clave, etiquetas, capacidades) y más. JSON portable. Imágenes = links https (.png preferido).</p>
+          <p id="cloudBackupStatus" style="font-size:12px;margin:0 0 8px;color:var(--muted)">Listo</p>
+          <div style="display:grid;gap:8px">
+            <button type="button" class="btn" id="btnCatCloudExport" style="background:var(--gold);color:#000;margin:0">⬇️ Firebase → JSON (respaldo total)</button>
+            <button type="button" class="btn" id="btnCatCloudImport" style="margin:0;background:#333;color:var(--text)">⬆️ JSON → Firebase (restaurar)</button>
+            <button type="button" class="btn" id="btnCatCloudReload" style="margin:0;background:#333;color:var(--text)">☁️ Recargar desde Firebase</button>
+          </div>
+          <input type="file" id="catCloudImportFile" accept="application/json,.json" style="display:none!important;position:absolute;width:0;height:0;opacity:0;pointer-events:none">
+        </div>
+      </div>
+    </div>
 
     <!-- 1. WhatsApp -->
     <div class="tool-item" id="admWa">

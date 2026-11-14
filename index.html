@@ -1735,7 +1735,7 @@ function viewPerfumeObs(id) {
   var ficha = (p.fichaTecnica && String(p.fichaTecnica).indexOf("http") === 0) ? p.fichaTecnica : "";
   var html = "";
   if (img) html += '<div style="text-align:center;margin-bottom:12px"><img src="' + img + '" alt="" style="max-width:100%;max-height:200px;border-radius:12px;border:1px solid #2e3d4f;object-fit:contain" onerror="this.style.display=\'none\'"></div>';
-  if (ficha) html += '<div style="margin:10px 0;text-align:center;background:#090d12;border:1px solid #2e3d4f;border-radius:12px;padding:6px"><img src="' + ficha + '" alt="Ficha técnica" style="display:block;width:100%;height:auto;max-height:72vh;object-fit:contain;object-position:center;margin:0 auto" onerror="this.parentElement.style.display=\'none\'"></div><div style="font-size:11px;word-break:break-all;margin-bottom:8px">📄 Ficha técnica: <a href="' + ficha + '" target="_blank" rel="noopener" style="color:#c9a227">abrir imagen</a> · <button type="button" onclick="copyCatalogFicha(\'' + ficha.replace(/\'/g, "") + '\')">📋 Copiar link</button></div>';
+  if (ficha) html += '<div style="margin:10px 0;text-align:center;background:#090d12;border:1px solid #2e3d4f;border-radius:12px;padding:6px"><img src="' + ficha + '" alt="Ficha técnica" style="display:block;width:100%;height:auto;max-height:72vh;object-fit:contain;object-position:center;margin:0 auto" onerror="this.parentElement.style.display=\'none\'"></div>';;
   html += '<div style="margin-bottom:8px">🪪 <strong>Código id:</strong> ' + escapeHtml(String(code)) + '</div>';
   html += '<div style="margin-bottom:8px">👃 <strong>Familia olfativa:</strong> ' + escapeHtml(fam) + '</div>';
   html += '<div style="margin-bottom:8px">🧴 <strong>Capacidades:</strong> ' + escapeHtml(sizesHintText()) + '</div>';

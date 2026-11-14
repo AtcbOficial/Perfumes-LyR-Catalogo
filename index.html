@@ -1043,8 +1043,10 @@ body.skin-navidad .card{border-color:#1b5e20}
           </div>
         </div>
         <label>Link imagen del perfume</label>
-        <input type="url" id="pImgUrl" placeholder="https://… (Drive, OneDrive, web)" style="margin-bottom:8px">
-        <p class="info-box" style="margin-top:0">Solo URL pública. No se sube archivo al Firebase.</p>
+        <input type="url" id="pImgUrl" placeholder="https://… imagen del producto" style="margin-bottom:8px">
+        <label>Link imagen ficha técnica</label>
+        <input type="url" id="pFichaUrl" placeholder="https://… imagen ficha técnica" style="margin-bottom:8px">
+        <p class="info-box" style="margin-top:0">La ficha técnica se muestra grande en 👀. Solo URL pública.</p>
         <img id="adminPreview" class="admin-preview" alt="Vista previa">
         <div class="img-hint" id="imgHint"></div>
         <input type="hidden" id="pImg" value="">
@@ -1517,6 +1519,7 @@ function onAdminFile(ev) {
       prev.src = dataUrl;
       prev.classList.add("show");
       document.getElementById("pImg").value = "";
+  var _pfu2 = document.getElementById("pFichaUrl"); if (_pfu2) _pfu2.value = "";
       document.getElementById("imgHint").textContent = "Nueva imagen lista · " + file.name + " (" + Math.round(dataUrl.length / 1024) + " KB)";
       toast("Imagen lista para guardar");
     }, { fileType: file.type || "", fileName: file.name || "" });
@@ -2270,6 +2273,8 @@ function editProduct(id) {
   pendingImageData = null;
   var _piu = document.getElementById("pImgUrl"); if (_piu) _piu.value = "";
   document.getElementById("pImg").value = p.img || "";
+  var _pfu = document.getElementById("pFichaUrl");
+  if (_pfu) _pfu.value = (p.fichaTecnica && String(p.fichaTecnica).indexOf("http") === 0) ? p.fichaTecnica : "";
   var pf = document.getElementById("pFile"); if (pf) pf.value = "";
   normalizeProductTags(p);
   renderProductTagsUI(p.tags || []);
@@ -2340,6 +2345,9 @@ function importFromControlJSON() {
         var codigo = normCodigoCat(it.codigo || it.code || "");
         var nombre = String(it.nombre || it.name || "").trim();
         var imgData = (typeof it.img === "string" && it.img.indexOf("http") === 0) ? it.img : "";
+        var fichaData = (typeof it.fichaTecnica === "string" && it.fichaTecnica.indexOf("http") === 0)
+          ? it.fichaTecnica
+          : ((typeof it.ficha === "string" && it.ficha.indexOf("http") === 0) ? it.ficha : "");
         setSt("Procesando " + i + "/" + items.length + " · " + (codigo || "?"));
         if (!codigo) { skipped++; setTimeout(next, 0); return; }
         if (!nombre && !imgData) { skipped++; setTimeout(next, 0); return; }
@@ -2460,10 +2468,16 @@ function saveProduct() {
   }
   var familia = ((document.getElementById("pFamilia") || {}).value || "").trim();
   var obs = ((document.getElementById("pObs") || {}).value || "").trim();
+  var fichaEl = document.getElementById("pFichaUrl");
+  var fichaTec = ((fichaEl && fichaEl.value) || "").trim();
+  if (fichaTec.indexOf("data:") === 0) fichaTec = "";
+  if (fichaTec && fichaTec.indexOf("http") !== 0) fichaTec = "";
   var payload = { name: name, gender: gender, promo: promo, agotado: agotado, tags: tags, familia: familia, obs: obs };
   if (code) payload.code = code;
   else if (editingId) payload.code = null;
   if (img) payload.img = img;
+  if (fichaTec) payload.fichaTecnica = fichaTec;
+  else if (editingId) payload.fichaTecnica = null;
   if (editingId) {
     if (!img) {
       /* mantener imagen anterior si no subió una nueva */

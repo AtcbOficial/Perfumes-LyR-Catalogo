@@ -867,6 +867,40 @@ body.skin-navidad .card{border-color:#1b5e20}
       </div>
     </div>
 
+    <!-- Stats -->
+    <div class="tool-item" id="admStats">
+      <button type="button" class="tool-item-head" onclick="toggleAdminTool('admStats'); loadStatsAdmin();">
+        <span>📊 Estadísticas del catálogo
+          <small>Vistas · carrito · pedidos WhatsApp · búsquedas</small>
+        </span>
+        <span class="chev">›</span>
+      </button>
+      <div class="tool-item-body">
+        <div class="info-box">Datos anónimos de clientes en el catálogo (no incluyen nombre ni teléfono).</div>
+        <div id="statsSummary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0;text-align:center">
+          <div style="background:#1a1a1a;border-radius:10px;padding:10px;border:1px solid #333"><div style="font-size:11px;color:var(--muted)">Vistas 👀</div><div id="stViews" style="font-size:18px;font-weight:800;color:var(--gold)">0</div></div>
+          <div style="background:#1a1a1a;border-radius:10px;padding:10px;border:1px solid #333"><div style="font-size:11px;color:var(--muted)">Carrito 🛒</div><div id="stCarts" style="font-size:18px;font-weight:800;color:#27ae60">0</div></div>
+          <div style="background:#1a1a1a;border-radius:10px;padding:10px;border:1px solid #333"><div style="font-size:11px;color:var(--muted)">Pedidos 📲</div><div id="stOrders" style="font-size:18px;font-weight:800;color:#3498db">0</div></div>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+          <button type="button" class="btn btn-secondary" style="width:auto;margin:0;padding:8px 12px" onclick="loadStatsAdmin()">🔄 Actualizar</button>
+          <button type="button" class="btn btn-secondary" style="width:auto;margin:0;padding:8px 12px" onclick="resetStatsConfirm()">🧹 Reiniciar stats</button>
+        </div>
+        <h3 style="color:var(--gold);font-size:14px;margin:12px 0 6px">👀 Más vistos</h3>
+        <div id="statsTopViews" style="font-size:13px;line-height:1.45;color:var(--muted)">Cargando…</div>
+        <h3 style="color:var(--gold);font-size:14px;margin:12px 0 6px">🛒 Más agregados al carrito</h3>
+        <div id="statsTopCarts" style="font-size:13px;line-height:1.45;color:var(--muted)">Cargando…</div>
+        <h3 style="color:var(--gold);font-size:14px;margin:12px 0 6px">📲 Más pedidos por WhatsApp</h3>
+        <div id="statsTopOrders" style="font-size:13px;line-height:1.45;color:var(--muted)">Cargando…</div>
+        <h3 style="color:var(--gold);font-size:14px;margin:12px 0 6px">📏 Capacidades más pedidas</h3>
+        <div id="statsSizes" style="font-size:13px;line-height:1.45;color:var(--muted)">Cargando…</div>
+        <h3 style="color:var(--gold);font-size:14px;margin:12px 0 6px">🔍 Búsquedas frecuentes</h3>
+        <div id="statsSearches" style="font-size:13px;line-height:1.45;color:var(--muted)">Cargando…</div>
+        <h3 style="color:var(--gold);font-size:14px;margin:12px 0 6px">📅 Últimos 7 días</h3>
+        <div id="statsDaily" style="font-size:13px;line-height:1.45;color:var(--muted)">Cargando…</div>
+      </div>
+    </div>
+
     <!-- 1. WhatsApp -->
     <div class="tool-item" id="admWa">
       <button type="button" class="tool-item-head" onclick="toggleAdminTool('admWa')">
@@ -1711,9 +1745,148 @@ function copyCatalogFicha(url) {
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(v).then(function(){toast("Link copiado")}).catch(function(){toast("No se pudo copiar")});
   else { var t=document.createElement("textarea"); t.value=v; document.body.appendChild(t); t.select(); try{document.execCommand("copy");toast("Link copiado")}catch(e){toast("No se pudo copiar")} t.remove(); }
 }
+
+/* ========== 📊 Estadísticas catálogo (anónimas) ========== */
+var _statsSearchTimer = null;
+var _statsSearchLast = "";
+function statsTodayKey() {
+  var d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+function statsInc(path, by) {
+  by = by || 1;
+  try {
+    db.ref(path).transaction(function(cur) {
+      return (Number(cur) || 0) + by;
+    });
+  } catch (e) { console.warn("statsInc", path, e); }
+}
+function trackProductEvent(productId, kind, extra) {
+  try {
+    if (productId == null || productId === "") return;
+    var id = String(productId);
+    var p = (products || []).find(function(x){ return sameId(x.id, id); });
+    var base = "stats/products/" + id;
+    var field = kind === "view" ? "views" : (kind === "cart" ? "carts" : (kind === "order" ? "orders" : null));
+    if (field) statsInc(base + "/" + field, 1);
+    statsInc("stats/totals/" + (field || kind), 1);
+    statsInc("stats/daily/" + statsTodayKey() + "/" + (field || kind), 1);
+    if (p) {
+      try {
+        db.ref(base + "/meta").update({
+          name: p.name || "",
+          code: String(p.code || p.codigo || ""),
+          updatedAt: Date.now()
+        });
+      } catch (e0) {}
+    }
+    if (kind === "cart" && extra && extra.size != null) {
+      var sz = String(extra.size).replace(/\s*ml$/i, "").trim();
+      if (sz) {
+        statsInc(base + "/sizes/" + sz, 1);
+        statsInc("stats/sizes/" + sz, 1);
+      }
+    }
+  } catch (e) { console.warn("trackProductEvent", e); }
+}
+function trackSearchTerm(term) {
+  try {
+    term = String(term || "").trim().toLowerCase().replace(/\s+/g, " ");
+    if (term.length < 2) return;
+    if (term === _statsSearchLast) return;
+    _statsSearchLast = term;
+    var key = term.replace(/[.#$\[\]\/]/g, "_").slice(0, 48);
+    statsInc("stats/searches/" + key + "/count", 1);
+    try { db.ref("stats/searches/" + key + "/term").set(term); } catch (e1) {}
+    statsInc("stats/daily/" + statsTodayKey() + "/searches", 1);
+  } catch (e) {}
+}
+function trackSearchDebounced(term) {
+  clearTimeout(_statsSearchTimer);
+  _statsSearchTimer = setTimeout(function(){ trackSearchTerm(term); }, 900);
+}
+function rankStatsMap(obj, valueKey) {
+  var rows = [];
+  if (!obj) return rows;
+  Object.keys(obj).forEach(function(id) {
+    var row = obj[id] || {};
+    var n = Number(row[valueKey] || 0);
+    if (n <= 0) return;
+    rows.push({
+      id: id,
+      n: n,
+      name: (row.meta && row.meta.name) || row.name || id,
+      code: (row.meta && row.meta.code) || row.code || ""
+    });
+  });
+  rows.sort(function(a,b){ return b.n - a.n; });
+  return rows;
+}
+function statsListHtml(rows, emptyMsg) {
+  if (!rows || !rows.length) return '<span style="color:var(--muted)">' + (emptyMsg || "Sin datos aún") + '</span>';
+  return rows.slice(0, 12).map(function(r, i) {
+    var cod = r.code ? (' <span style="color:var(--gold)">' + escapeHtml(String(r.code)) + '</span>') : '';
+    return '<div style="display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid #2a2a2a">' +
+      '<span><strong style="color:var(--text)">' + (i+1) + '.</strong> ' + escapeHtml(r.name || r.id) + cod + '</span>' +
+      '<strong style="color:var(--gold)">' + r.n + '</strong></div>';
+  }).join("");
+}
+function loadStatsAdmin() {
+  var boxV = document.getElementById("statsTopViews");
+  if (!boxV) return;
+  boxV.textContent = "Cargando…";
+  db.ref("stats").once("value").then(function(snap) {
+    var s = snap.val() || {};
+    var totals = s.totals || {};
+    var el;
+    el = document.getElementById("stViews"); if (el) el.textContent = Number(totals.views || 0);
+    el = document.getElementById("stCarts"); if (el) el.textContent = Number(totals.carts || 0);
+    el = document.getElementById("stOrders"); if (el) el.textContent = Number(totals.orders || 0);
+    var prods = s.products || {};
+    document.getElementById("statsTopViews").innerHTML = statsListHtml(rankStatsMap(prods, "views"), "Aún no hay vistas de fichas");
+    document.getElementById("statsTopCarts").innerHTML = statsListHtml(rankStatsMap(prods, "carts"), "Aún no agregan al carrito");
+    document.getElementById("statsTopOrders").innerHTML = statsListHtml(rankStatsMap(prods, "orders"), "Aún no hay pedidos WA");
+    // sizes
+    var sizes = s.sizes || {};
+    var sizeRows = Object.keys(sizes).map(function(k){ return { id: k, name: k + " ml", n: Number(sizes[k]||0), code: "" }; })
+      .filter(function(r){ return r.n > 0; })
+      .sort(function(a,b){ return b.n - a.n; });
+    document.getElementById("statsSizes").innerHTML = statsListHtml(sizeRows, "Sin datos de capacidades");
+    // searches
+    var searches = s.searches || {};
+    var srows = Object.keys(searches).map(function(k) {
+      var row = searches[k] || {};
+      return { id: k, name: row.term || k, n: Number(row.count || 0), code: "" };
+    }).filter(function(r){ return r.n > 0; }).sort(function(a,b){ return b.n - a.n; });
+    document.getElementById("statsSearches").innerHTML = statsListHtml(srows, "Sin búsquedas aún");
+    // daily last 7
+    var daily = s.daily || {};
+    var days = Object.keys(daily).sort().reverse().slice(0, 7);
+    if (!days.length) {
+      document.getElementById("statsDaily").innerHTML = '<span style="color:var(--muted)">Sin actividad diaria aún</span>';
+    } else {
+      document.getElementById("statsDaily").innerHTML = days.map(function(d) {
+        var x = daily[d] || {};
+        return '<div style="padding:6px 0;border-bottom:1px solid #2a2a2a"><strong style="color:var(--text)">' + d + '</strong> · 👀 ' + (x.views||0) + ' · 🛒 ' + (x.carts||0) + ' · 📲 ' + (x.orders||0) + (x.searches ? (' · 🔍 ' + x.searches) : '') + '</div>';
+      }).join("");
+    }
+  }).catch(function(err) {
+    console.warn(err);
+    toast("No se pudieron cargar estadísticas");
+  });
+}
+function resetStatsConfirm() {
+  if (!confirm("¿Borrar TODAS las estadísticas del catálogo? No borra productos.")) return;
+  db.ref("stats").remove().then(function() {
+    toast("Estadísticas reiniciadas");
+    loadStatsAdmin();
+  }).catch(function(){ toast("No se pudo reiniciar"); });
+}
+
 function viewPerfumeObs(id) {
   var p = (products || []).find(function(x){ return String(x.id) === String(id); });
   if (!p) return toast("No encontrado");
+  try { trackProductEvent(p.id, "view"); } catch (eV) {}
   var fam = p.familia || p.familiaOlfativa || "—";
   var obs = p.obs || p.observaciones || "";
   var code = p.code || p.codigo || "—";
@@ -1752,6 +1925,7 @@ function viewPerfumeObs(id) {
 }
 function renderCatalog() {
   var q = (document.getElementById("search").value || "").toLowerCase();
+  try { if (q && q.trim().length >= 2) trackSearchDebounced(q); } catch (eS) {}
   var list = products.filter(function(p) {
     var matchQ = !q || (p.name || "").toLowerCase().includes(q)
       || (p.code || p.codigo || "").toLowerCase().includes(q)
@@ -1816,6 +1990,7 @@ function addToCartDirect(productId, size, fromEl) {
     qty: 1,
     codigo: (p.code || p.codigo || "")
   });
+  try { trackProductEvent(productId, "cart", { size: size }); } catch (eC) {}
   /* Animación visible: el +1 vuela hacia el ícono del carrito */
   flyToCart(fromEl || document.getElementById("navCarrito"));
   updateCartBadge();
@@ -2080,6 +2255,12 @@ function sendWhatsApp() {
   } catch (e) {}
   var texto = lines.join("\n").replace(/\n+$/, "");
   var url = "https://wa.me/" + (config.wa || "584120000000") + "?text=" + encodeURIComponent(texto);
+  try {
+    cart.forEach(function(c) {
+      var q = Number(c.qty) || 1;
+      for (var i = 0; i < q; i++) trackProductEvent(c.id, "order", { size: c.size });
+    });
+  } catch (eO) {}
   window.open(url, "_blank");
 
   cart = [];
